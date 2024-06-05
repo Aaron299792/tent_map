@@ -1,47 +1,55 @@
 #include<iostream> 
 #include<vector>
 
-std::vector<double> tent_map(double init_val, std::vector<double> a, std::vector<double> x){
+std::vector<double> tent_map(double &init_val, std::vector<double> &a, std::vector<double> &x){
+  int rows = a.size();
+  int cols = x.size()/rows;
 
-  for(int i = 0; i < a.size(); ++i){
-    x[(i*x.size)] = 0.2;
-    for(int j = 0; i < x.size()-1; ++j){
-      if ([ (i*x.size()) + j ] > 0.0 and x[ (i*x.size()) + j ] < 0.5){
-        x[ (i*x.size() + (j+1))] = 2*a[i]*x[(i*x.size()) + j];
+  for(int i = 0; i < rows; ++i){
+    x[(i*cols)] = 0.2;
+    for(int j = 0; j < (cols-1); ++j){
+      if ( x[(i*cols) + j ] > 0.0 and x[ (i*cols) + j ] < 0.5){
+        x[ (i*cols) + (j+1)] = 2*a[i]*x[(i*cols) + j];
       }
-      else if(x[ (i*x.size()) + j ] > 0.5 and [ (i*x.size()) + j ] < 1.0){
-        x[ (i*x.size() + (j+1))] = 2*a[i]*(1 - x[(i*x.size()) + j]);
+      else if( x[ (i*cols) + j ] > 0.5 and x[ (i*cols) + j ] < 1.0){
+        x[ (i*cols) + (j+1)] = 2*a[i]*(1 - x[(i*cols) + j]);
       }
-
+    }
+  }
+      
   return x;
 }
 
-void alpha(std::vector<double> a, double stop){
-  double step = stop/a.size();
-  for (int i = 0; i < a.size(); ++i){
+std::vector<double> parameter(std::vector<double> &a, double stop){
+  int size = a.size();
+  double step = stop/size;
+  for (int i = 0; i < size; ++i){
     a[i] = i*step;
   }
+ 
+  return a;
 }
 
-void print_result(std::vector<double> x_1, std::vector<double> x_2){
-  if (x_1.size() != x_2.size()){
-    std::cout << "La función no aplica para vectores de distinto tamaño" << std::endl;
-    exit(1);
-  }
-
-  for(int i = 0; i < x_1.size(); ++i){
-    std::cout << i+1 << " " << x_1[i] << " " << x_2[i] << std::endl;
+void print_mat(std::vector<double> &mat, int &rows, int &cols){
+  for (int j = 0; j < cols; ++j){
+    for(int i = 0; i < rows; ++i){
+      std::cout << mat[j + (i*cols) ] << " ";
+    }
+    std::cout << std::endl;
   }
 }
 
 int main(){
   
   int n_iter = 20;
-  int n_alpha = 280;
-  double init_val;
+  int n_alpha = 100;
+  double init_val = 0.2;
 
   std::vector<double> x(n_alpha*n_iter, 0.0);
-  std::vecotr<double> a(n_alpha, 0.0);
+  std::vector<double> a(n_alpha, 0.0);
 
+  a = parameter(a, 1.0);
+  x = tent_map(init_val,a,x);
+  print_mat(x, n_alpha, n_iter);
   return 0;
 }
